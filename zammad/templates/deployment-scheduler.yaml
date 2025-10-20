@@ -11,9 +11,12 @@ metadata:
     checkov.io/skip2: CKV_K8S_9=Readiness Probe Should be Configured - not possible with scheduler
 spec:
   replicas: 1 # Not scalable, may only run once per cluster.
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       {{- include "zammad.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: zammad-scheduler
   template:
     metadata:
       annotations:
@@ -29,6 +32,22 @@ spec:
         {{- end }}
     spec:
       {{- include "zammad.podSpec.deployment" . | nindent 6 }}
+      {{- with .Values.zammadConfig.scheduler.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.zammadConfig.scheduler.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.zammadConfig.scheduler.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.zammadConfig.scheduler.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         {{- with .Values.zammadConfig.scheduler.sidecars }}
         {{- toYaml . | nindent 8}}

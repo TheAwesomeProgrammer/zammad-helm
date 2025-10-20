@@ -35,28 +35,31 @@ spec:
         {{- end }}
     spec:
       {{- include "zammad.podSpec" . | nindent 6 }}
+      {{- with .Values.zammadConfig.initJob.podSpec }}
+      {{- toYaml . | nindent 6}}
+      {{- end }}
+      {{- with .Values.zammadConfig.initJob.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.zammadConfig.initJob.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.zammadConfig.initJob.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.zammadConfig.initJob.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       restartPolicy: OnFailure
-      containers:
+      initContainers:
         {{- with .Values.initContainers }}
         {{- toYaml . | nindent 8}}
         {{- end }}
-        {{- if .Values.zammadConfig.initContainers.volumePermissions.enabled }}
-        - name: zammad-volume-permissions
-          image: "{{ .Values.zammadConfig.initContainers.volumePermissions.image.repository }}:{{ .Values.zammadConfig.initContainers.volumePermissions.image.tag }}"
-          imagePullPolicy: {{ .Values.zammadConfig.initContainers.volumePermissions.image.pullPolicy }}
-          command:
-            {{- .Values.zammadConfig.initContainers.volumePermissions.command | toYaml | nindent 12 }}
-          {{- with .Values.zammadConfig.initContainers.volumePermissions.resources }}
-          resources:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          {{- with .Values.zammadConfig.initContainers.volumePermissions.securityContext }}
-          securityContext:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          volumeMounts:
-            {{- include "zammad.volumeMounts" . | nindent 12 }}
-        {{- end }}
+        {{- include "zammad.podSpec.initContainers" . | nindent 8 }}
         - name: postgresql-init
           {{- include "zammad.containerSpec" (merge (dict "containerConfig" .Values.zammadConfig.initContainers.postgresql) .) | nindent 10 }}
           env:
@@ -100,6 +103,18 @@ spec:
               readOnly: true
               subPath: elasticsearch-init
         {{- end }}
+      containers:
+        - name: postgresql-init-post
+          {{- include "zammad.containerSpec" (merge (dict "containerConfig" .Values.zammadConfig.initContainers.postgresql) .) | nindent 10 }}
+          env:
+            {{- include "zammad.env" . | nindent 12 }}
+            {{- include "zammad.env.failOnPendingMigrations" . | nindent 12 }}
+          volumeMounts:
+            {{- include "zammad.volumeMounts" . | nindent 12 }}
+            - name: {{ include "zammad.fullname" . }}-init
+              mountPath: /docker-entrypoint.sh
+              readOnly: true
+              subPath: postgresql-init-post
       volumes:
         {{- include "zammad.volumes" . | nindent 8 }}
         - name: {{ include "zammad.fullname" . }}-init

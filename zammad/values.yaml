@@ -73,7 +73,7 @@ zammadConfig:
     initialisation: true
     pass: ""
     port: 9200
-    reindex: true
+    reindex: false
     schema: http
     user: ""
 
@@ -101,23 +101,22 @@ zammadConfig:
     # Maximum upload size
     clientMaxBodySize: 50M
     knowledgeBaseUrl: ""
+    startupProbe:
+      tcpSocket:
+        port: 8080
+      failureThreshold: 20
+      periodSeconds: 4
     livenessProbe:
       tcpSocket:
         port: 8080
-      initialDelaySeconds: 30
-      successThreshold: 1
       failureThreshold: 5
       timeoutSeconds: 5
-      periodSeconds: 10
     readinessProbe:
       httpGet:
         path: /
         port: 8080
-      initialDelaySeconds: 30
-      successThreshold: 1
       failureThreshold: 5
       timeoutSeconds: 5
-      periodSeconds: 10
     resources: {}
       # requests:
       #   cpu: 50m
@@ -138,6 +137,37 @@ zammadConfig:
       # my-label: "value"
     podAnnotations: {}
       # my-annotation: "value"
+    nodeSelector: {}
+      # node-label: "value"
+    tolerations: []
+      # - key: "key"
+      #   operator: "Equal"
+      #   value: "value"
+      #   effect: "NoSchedule"
+    affinity: {}
+      # nodeAffinity:
+      #   requiredDuringSchedulingIgnoredDuringExecution:
+      #     nodeSelectorTerms:
+      #       - matchExpressions:
+      #           - key: "node-label"
+      #             operator: In
+      #             values:
+      #               - "value"
+      # podAntiAffinity:
+      #   preferredDuringSchedulingIgnoredDuringExecution:
+      #     - weight: 100
+      #       podAffinityTerm:
+      #         topologyKey: kubernetes.io/hostname # For host anti-affinity
+      #         labelSelector:
+      #           matchLabels:
+      #             app.kubernetes.io/component: zammad-nginx
+    topologySpreadConstraints: []
+      # - maxSkew: 1
+      #   topologyKey: "kubernetes.io/hostname"
+      #   whenUnsatisfiable: ScheduleAnyway
+      #   labelSelector:
+      #     matchLabels:
+      #      app.kubernetes.io/name: zammad
 
   postgresql:
     # enable/disable postgresql chart dependency
@@ -156,23 +186,22 @@ zammadConfig:
 
   railsserver:
     replicas: 1
+    startupProbe:
+      tcpSocket:
+        port: 3000
+      failureThreshold: 20
+      periodSeconds: 4
     livenessProbe:
       tcpSocket:
         port: 3000
-      initialDelaySeconds: 30
-      successThreshold: 1
       failureThreshold: 5
       timeoutSeconds: 5
-      periodSeconds: 10
     readinessProbe:
       httpGet:
         path: /
         port: 3000
-      initialDelaySeconds: 30
-      successThreshold: 1
       failureThreshold: 5
       timeoutSeconds: 5
-      periodSeconds: 10
     resources: {}
       # requests:
       #   cpu: 100m
@@ -197,6 +226,37 @@ zammadConfig:
       # my-label: "value"
     podAnnotations: {}
       # my-annotation: "value"
+    affinity: {}
+      # nodeAffinity:
+      #   requiredDuringSchedulingIgnoredDuringExecution:
+      #     nodeSelectorTerms:
+      #       - matchExpressions:
+      #           - key: "node-label"
+      #             operator: In
+      #             values:
+      #               - "value"
+      # podAntiAffinity:
+      #   preferredDuringSchedulingIgnoredDuringExecution:
+      #     - weight: 100
+      #       podAffinityTerm:
+      #         topologyKey: kubernetes.io/hostname # For host anti-affinity
+      #         labelSelector:
+      #           matchLabels:
+      #             app.kubernetes.io/component: zammad-railsserver
+    nodeSelector: {}
+      # node-label: "value"
+    tolerations: []
+      # - key: "key"
+      #   operator: "Equal"
+      #   value: "value"
+      #   effect: "NoSchedule"
+    topologySpreadConstraints: []
+      # - maxSkew: 1
+      #   topologyKey: "kubernetes.io/hostname"
+      #   whenUnsatisfiable: ScheduleAnyway
+      #   labelSelector:
+      #     matchLabels:
+      #      app.kubernetes.io/name: zammad
 
   redis:
     # enable/disable redis chart dependency
@@ -227,6 +287,29 @@ zammadConfig:
       # my-label: "value"
     podAnnotations: {}
       # my-annotation: "value"
+    affinity: {}
+      # nodeAffinity:
+      #   requiredDuringSchedulingIgnoredDuringExecution:
+      #     nodeSelectorTerms:
+      #       - matchExpressions:
+      #           - key: "node-label"
+      #             operator: In
+      #             values:
+      #               - "value"
+    nodeSelector: {}
+      # node-label: "value"
+    tolerations: []
+      # - key: "key"
+      #   operator: "Equal"
+      #   value: "value"
+      #   effect: "NoSchedule"
+    topologySpreadConstraints: []
+      # - maxSkew: 1
+      #   topologyKey: "kubernetes.io/hostname"
+      #   whenUnsatisfiable: ScheduleAnyway
+      #   labelSelector:
+      #     matchLabels:
+      #      app.kubernetes.io/name: zammad
 
   storageVolume:
     # Enable this for 'File' based storage in Zammad. You must provide an externally managed 'extistingClaim'
@@ -259,20 +342,19 @@ zammadConfig:
     #   readOnly: true
 
   websocket:
+    startupProbe:
+      tcpSocket:
+        port: 6042
+      failureThreshold: 20
+      periodSeconds: 4
     livenessProbe:
       tcpSocket:
         port: 6042
-      initialDelaySeconds: 10
-      periodSeconds: 10
-      successThreshold: 1
       failureThreshold: 10
       timeoutSeconds: 5
     readinessProbe:
       tcpSocket:
         port: 6042
-      initialDelaySeconds: 10
-      periodSeconds: 10
-      successThreshold: 1
       failureThreshold: 5
       timeoutSeconds: 5
     resources: {}
@@ -295,6 +377,29 @@ zammadConfig:
       # my-label: "value"
     podAnnotations: {}
       # my-annotation: "value"
+    affinity: {}
+      # nodeAffinity:
+      #   requiredDuringSchedulingIgnoredDuringExecution:
+      #     nodeSelectorTerms:
+      #       - matchExpressions:
+      #           - key: "node-label"
+      #             operator: In
+      #             values:
+      #               - "value"
+    nodeSelector: {}
+      # node-label: "value"
+    tolerations: []
+      # - key: "key"
+      #   operator: "Equal"
+      #   value: "value"
+      #   effect: "NoSchedule"
+    topologySpreadConstraints: []
+      # - maxSkew: 1
+      #   topologyKey: "kubernetes.io/hostname"
+      #   whenUnsatisfiable: ScheduleAnyway
+      #   labelSelector:
+      #     matchLabels:
+      #      app.kubernetes.io/name: zammad
 
   initContainers:
     elasticsearch:
@@ -327,12 +432,14 @@ zammadConfig:
             - ALL
         readOnlyRootFilesystem: true
         privileged: false
-    # volumePermissions will be used by all Zammad Pods
+    # VolumePermissions will be used by all Zammad Pods.
+    # We need it to drop global write permission that comes with EmptyDir, otherwise
+    #   Ruby's Tempfile.create raises an error.
     volumePermissions:
       enabled: true
       image:
         repository: alpine
-        tag: "3.20.2"
+        tag: "3.22.1"
         pullPolicy: IfNotPresent
       command:
         - /bin/sh
@@ -380,6 +487,48 @@ zammadConfig:
       # my-label: "value"
     podAnnotations: {}
     # my-annotation: "value"
+    podSpec: {}
+    # my-podspec: "value"
+    affinity: {}
+      # nodeAffinity:
+      #   requiredDuringSchedulingIgnoredDuringExecution:
+      #     nodeSelectorTerms:
+      #       - matchExpressions:
+      #           - key: "node-label"
+      #             operator: In
+      #             values:
+      #               - "value"
+    nodeSelector: {}
+      # node-label: "value"
+    tolerations: []
+      # - key: "key"
+      #   operator: "Equal"
+      #   value: "value"
+      #   effect: "NoSchedule"
+
+    topologySpreadConstraints: []
+      # - maxSkew: 1
+      #   topologyKey: "kubernetes.io/hostname"
+      #   whenUnsatisfiable: ScheduleAnyway
+      #   labelSelector:
+      #     matchLabels:
+      #      app.kubernetes.io/name: zammad
+
+  cronJob:
+    reindex:
+      # By default, this cronjob never runs. It can be used to create maintenance jobs with
+      #   kubectl create job my-reindex-job --from=cronjob/zammad-cronjob-reindex
+      # You can change schedule and suspend to run it periodically.
+      schedule: "@weekly"
+      suspend: true
+      annotations: {}
+      # my-annotation: "value"
+      podLabels: {}
+        # my-label: "value"
+      podAnnotations: {}
+      # my-annotation: "value"
+      podSpec: {}
+      # my-podspec: "value"
 
 # additional environment vars added to all zammad services
 extraEnv: []
@@ -424,18 +573,47 @@ autoWizard:
   #     ]
   #   }
 
-commonLabels: {}
-  # my-label: "value"
+# Common pod affinity for all Zammad components. Values in .Zammad.*.affinity will override this.
+affinity: {}
+  # nodeAffinity:
+  #   requiredDuringSchedulingIgnoredDuringExecution:
+  #     nodeSelectorTerms:
+  #       - matchExpressions:
+  #           - key: "node-label"
+  #             operator: In
+  #             values:
+  #               - "value"
+
 commonAnnotations: {}
   # my-annotation: "value"
-podLabels: {}
-    # my-label: "value"
+
+commonLabels: {}
+  # my-label: "value"
+
+# Common pod nodeSelector for all Zammad components. Values in .Zammad.*.nodeSelector will override this.
+nodeSelector: {}
+  # node-label: "value"
+
 podAnnotations: {}
   # my-annotation: "value"
 
-nodeSelector: {}
+podLabels: {}
+  # my-label: "value"
+
+# Common pod tolerations for all Zammad components. Values in .Zammad.*.tolerations will override this.
 tolerations: []
-affinity: {}
+  # - key: "key"
+  #   operator: "Equal"
+  #   value: "value"
+  #   effect: "NoSchedule"
+
+topologySpreadConstraints: []
+  # - maxSkew: 1
+  #   topologyKey: "kubernetes.io/hostname"
+  #   whenUnsatisfiable: ScheduleAnyway
+  #   labelSelector:
+  #     matchLabels:
+  #      app.kubernetes.io/name: zammad
 
 # service account configurations
 serviceAccount:
@@ -471,6 +649,15 @@ initContainers: []
 
 # Settings for the elasticsearch subchart
 elasticsearch:
+  # Workaround: switch to bitnami legacy image repository (https://github.com/bitnami/containers/issues/83267)
+  image:
+    repository: bitnamilegacy/elasticsearch
+  sysctlImage:
+    repository: bitnamilegacy/os-shell
+  global:
+    security:
+      allowInsecureImages: true
+
   clusterName: zammad
   coordinating:
     replicaCount: 0
@@ -482,6 +669,7 @@ elasticsearch:
     heapSize: 512m
     masterOnly: false
     replicaCount: 1
+    resourcesPreset: medium
     resources: {}
       # requests:
       #   cpu: 50m
@@ -498,6 +686,13 @@ elasticsearch:
 
 # settings for the memcached subchart
 memcached:
+  # Workaround: switch to bitnami legacy image repository (https://github.com/bitnami/containers/issues/83267)
+  image:
+    repository: bitnamilegacy/memcached
+  global:
+    security:
+      allowInsecureImages: true
+
   replicaCount: 1
   resources: {}
     # requests:
@@ -509,6 +704,13 @@ memcached:
 
 # settings for the minio subchart
 minio:
+  # Workaround: switch to bitnami legacy image repository (https://github.com/bitnami/containers/issues/83267)
+  image:
+    repository: bitnamilegacy/minio
+  global:
+    security:
+      allowInsecureImages: true
+
   auth:
     rootUser: zammadadmin
     rootPassword: zammadadmin
@@ -525,6 +727,13 @@ minio:
 
 # settings for the postgres subchart
 postgresql:
+  # Workaround: switch to bitnami legacy image repository (https://github.com/bitnami/containers/issues/83267)
+  image:
+    repository: bitnamilegacy/postgresql
+  global:
+    security:
+      allowInsecureImages: true
+
   auth:
     username: "zammad"
     replicationUsername: repl_user
@@ -556,6 +765,13 @@ postgresql:
 
 # settings for the redis subchart
 redis:
+  # Workaround: switch to bitnami legacy image repository (https://github.com/bitnami/containers/issues/83267)
+  image:
+    repository: bitnamilegacy/redis
+  global:
+    security:
+      allowInsecureImages: true
+
   architecture: standalone
   auth:
     password: zammad
